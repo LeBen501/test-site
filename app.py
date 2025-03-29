@@ -12,7 +12,7 @@ df = load_data()
 # Funktion zum Abrufen des Wikipedia-Bildes
 def get_wikipedia_image(name):
     # Spezifizieren eines benutzerdefinierten User-Agent
-    wiki_wiki = wikipediaapi.Wikipedia('en', user_agent="AthleteFinder (suberio.01.11@gmail.com)")  
+    wiki_wiki = wikipediaapi.Wikipedia(language='en', user_agent="AthleteFinderApp (suberio.01.11@gmail.com)") 
     page = wiki_wiki.page(name)
     if page.exists():
         for image in page.images:
