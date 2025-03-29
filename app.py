@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
-import wikipediaapi  # Verwende wikipedia-api statt wikipedia
+import wikipediaapi
+import requests
+from bs4 import BeautifulSoup
 
 # CSV-Datei laden
 @st.cache_data
@@ -13,10 +15,19 @@ df = load_data()
 def get_wikipedia_image(name):
     wiki_wiki = wikipediaapi.Wikipedia(language='en', user_agent="AthleteFinderApp (suberio.01.11@gmail.com)") 
     page = wiki_wiki.page(name)
+    
     if page.exists():
-        for image in page.images:
-            if image.endswith(('jpg', 'jpeg', 'png')):
-                return image
+        # Wir müssen die Wikipedia-Seite mit requests laden, um Bilder zu extrahieren
+        url = page.fullurl
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Suche nach dem ersten Bild auf der Seite
+        img_tag = soup.find('img')
+        if img_tag:
+            # Das Bild in der Wikipedia-Seite hat normalerweise das Attribut 'src'
+            img_url = 'https:' + img_tag['src']
+            return img_url
     return None
 
 # Titel der App
@@ -50,6 +61,3 @@ if st.button("🔍 Athlet finden"):
                 st.image(image_url, caption=top_athlete, use_column_width=True)
             else:
                 st.info("📷 Kein Bild verfügbar.")
-
-
-
