@@ -35,8 +35,6 @@ def get_wikipedia_image(name):
                 elif img_url.startswith('/'):
                     img_url = 'https://en.wikipedia.org' + img_url
 
-                # Ausgabe der Bild-URL zur Überprüfung
-                st.write(f"Gefundene Bild-URL: {img_url}")
                 return img_url
     return None
 
@@ -56,18 +54,24 @@ if st.button("🔍 Athlet finden"):
     if filtered_df.empty:
         st.warning("❌ Kein passender Athlet gefunden.")
     else:
+        # Filtern nach Medaillen und den erfolgreichsten Athleten ermitteln
         medal_count = filtered_df[filtered_df["Medal"].notna()].groupby("Name")["Medal"].count()
-        
+
+        # Wenn kein Athlet mit Medaillen gefunden wurde, zeige einen Athleten ohne Medaille
         if medal_count.empty:
-            st.warning("⚠️ Kein passender Athlet mit Medaillen gefunden.")
+            # In diesem Fall einen Athleten ohne Medaille finden
+            top_athlete = filtered_df.loc[filtered_df["Medal"].isna(), "Name"].iloc[0]
+            max_medals = 0
+            st.warning("⚠️ Kein Athlet mit Medaillen gefunden. Der erste Athlet ohne Medaillen wird angezeigt.")
         else:
             top_athlete = medal_count.idxmax()
             max_medals = medal_count.max()
             st.success(f"🏆 Erfolgreichster Athlet: **{top_athlete}** mit **{max_medals}** Medaillen!")
-            
-            # Wikipedia-Bild abrufen und anzeigen
-            image_url = get_wikipedia_image(top_athlete)
-            if image_url:
-                st.image(image_url, caption=top_athlete)
-            else:
-                st.info("📷 Kein Bild verfügbar.")
+
+        # Wikipedia-Bild abrufen und anzeigen
+        image_url = get_wikipedia_image(top_athlete)
+        if image_url:
+            st.image(image_url, caption=top_athlete)
+        else:
+            st.info("📷 Kein Bild verfügbar.")
+
