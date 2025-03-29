@@ -22,12 +22,12 @@ def get_wikipedia_image(name):
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
         
-        # Suche nach dem ersten Bild auf der Seite
+        # Suche nach dem ersten Bild auf der Seite, das im HTML Tag <img> enthalten ist
         img_tag = soup.find('img')
+        
         if img_tag:
-            # Das Bild in der Wikipedia-Seite hat normalerweise das Attribut 'src'
             img_url = img_tag['src']
-            # Wenn der Link relativ ist, fügen wir "https:" hinzu
+            # Bild-URL ggf. anpassen
             if img_url.startswith('//'):
                 img_url = 'https:' + img_url
             elif img_url.startswith('/'):
