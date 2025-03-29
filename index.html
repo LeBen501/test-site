@@ -1,4 +1,38 @@
-<py-script>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finde den erfolgreichsten Athleten</title>
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+</head>
+<body>
+    <h1>Finde den erfolgreichsten Athleten</h1>
+
+    <label>Größe (cm):</label>
+    <input type="number" id="height">
+
+    <label>Gewicht (kg):</label>
+    <input type="number" id="weight">
+
+    <label>Geschlecht:</label>
+    <select id="sex">
+        <option value="M">Männlich</option>
+        <option value="F">Weiblich</option>
+    </select>
+
+    <button py-click="find_athlete">Suchen</button>
+
+    <div id="result"></div>
+
+    <py-env>
+    {
+      "packages": [],
+      "fetch": ["athletes.json"]
+    }
+    </py-env>
+
+    <py-script>
     import json
     import js
 
@@ -21,7 +55,7 @@
         else:
             best_athlete = max(matching_athletes, key=lambda x: x["Medals"])
             Element("result").element.innerText = f"Erfolgreichster Athlet: {best_athlete['Name']} mit {best_athlete['Medals']} Medaillen!"
-</py-script>
+    </py-script>
 
-
-
+</body>
+</html>
