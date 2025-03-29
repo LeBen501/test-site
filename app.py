@@ -32,6 +32,9 @@ def get_wikipedia_image(name):
                 img_url = 'https:' + img_url
             elif img_url.startswith('/'):
                 img_url = 'https://en.wikipedia.org' + img_url
+
+            # Ausgabe der Bild-URL zur Überprüfung
+            st.write(f"Gefundene Bild-URL: {img_url}")
             return img_url
     return None
 
@@ -66,4 +69,3 @@ if st.button("🔍 Athlet finden"):
                 st.image(image_url, caption=top_athlete)
             else:
                 st.info("📷 Kein Bild verfügbar.")
-
