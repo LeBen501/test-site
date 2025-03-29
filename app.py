@@ -30,6 +30,8 @@ def get_wikipedia_image(name):
             # Wenn der Link relativ ist, fügen wir "https:" hinzu
             if img_url.startswith('//'):
                 img_url = 'https:' + img_url
+            elif img_url.startswith('/'):
+                img_url = 'https://en.wikipedia.org' + img_url
             return img_url
     return None
 
@@ -64,3 +66,4 @@ if st.button("🔍 Athlet finden"):
                 st.image(image_url, caption=top_athlete, use_column_width=True)
             else:
                 st.info("📷 Kein Bild verfügbar.")
+
