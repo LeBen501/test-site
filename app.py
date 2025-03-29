@@ -22,20 +22,22 @@ def get_wikipedia_image(name):
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
         
-        # Bild extrahieren: Suche nach dem ersten gültigen Bild
-        img_tag = soup.find('img')
-        
-        if img_tag:
-            img_url = img_tag['src']
-            # Bild-URL ggf. anpassen
-            if img_url.startswith('//'):
-                img_url = 'https:' + img_url
-            elif img_url.startswith('/'):
-                img_url = 'https://en.wikipedia.org' + img_url
+        # Suchen nach einem Bild innerhalb einer Infobox oder einem ähnlichen Bereich
+        infobox = soup.find('table', {'class': 'infobox'})
+        if infobox:
+            # Suche nach dem Bild innerhalb der Infobox
+            img_tag = infobox.find('img')
+            if img_tag:
+                img_url = img_tag['src']
+                # Bild-URL ggf. anpassen
+                if img_url.startswith('//'):
+                    img_url = 'https:' + img_url
+                elif img_url.startswith('/'):
+                    img_url = 'https://en.wikipedia.org' + img_url
 
-            # Ausgabe der Bild-URL zur Überprüfung
-            st.write(f"Gefundene Bild-URL: {img_url}")
-            return img_url
+                # Ausgabe der Bild-URL zur Überprüfung
+                st.write(f"Gefundene Bild-URL: {img_url}")
+                return img_url
     return None
 
 # Titel der App
