@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import wikipedia
+import wikipediaapi  # Wechsel zu wikipedia-api
 
 # CSV-Datei laden
 @st.cache_data
@@ -11,13 +11,12 @@ df = load_data()
 
 # Funktion zum Abrufen des Wikipedia-Bildes
 def get_wikipedia_image(name):
-    try:
-        page = wikipedia.page(name)
+    wiki_wiki = wikipediaapi.Wikipedia('en')  # Wikipedia-Instanz für Englisch
+    page = wiki_wiki.page(name)
+    if page.exists():
         for image in page.images:
             if image.endswith(('jpg', 'jpeg', 'png')):
                 return image
-    except:
-        return None
     return None
 
 # Titel der App
@@ -51,3 +50,4 @@ if st.button("🔍 Athlet finden"):
                 st.image(image_url, caption=top_athlete, use_column_width=True)
             else:
                 st.info("📷 Kein Bild verfügbar.")
+
