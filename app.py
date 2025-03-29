@@ -17,12 +17,12 @@ def get_wikipedia_image(name):
     page = wiki_wiki.page(name)
     
     if page.exists():
-        # Wir müssen die Wikipedia-Seite mit requests laden, um Bilder zu extrahieren
+        # Wikipedia-Seite mit requests laden
         url = page.fullurl
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
         
-        # Suche nach dem ersten Bild auf der Seite, das im HTML Tag <img> enthalten ist
+        # Bild extrahieren: Suche nach dem ersten gültigen Bild
         img_tag = soup.find('img')
         
         if img_tag:
