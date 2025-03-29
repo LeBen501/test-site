@@ -63,7 +63,6 @@ if st.button("🔍 Athlet finden"):
             # Wikipedia-Bild abrufen und anzeigen
             image_url = get_wikipedia_image(top_athlete)
             if image_url:
-                st.image(image_url, caption=top_athlete, use_column_width=True)
+                st.image(image_url, caption=top_athlete)
             else:
                 st.info("📷 Kein Bild verfügbar.")
-
