@@ -22,13 +22,13 @@ def get_wikipedia_image(name):
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
         
-        # Suchen nach einem Bild innerhalb einer Infobox oder einem ähnlichen Bereich
-        infobox = soup.find('table', {'class': 'infobox'})
-        if infobox:
-            # Suche nach dem Bild innerhalb der Infobox
-            img_tag = infobox.find('img')
-            if img_tag:
-                img_url = img_tag['src']
+        # Suchen nach allen Bildern auf der Seite
+        img_tags = soup.find_all('img')
+        
+        # Durchsuche alle Bilder und suche nach einem mit den Formaten jpg, jpeg, png
+        for img_tag in img_tags:
+            img_url = img_tag.get('src')
+            if img_url and (img_url.endswith(('jpg', 'jpeg', 'png'))):
                 # Bild-URL ggf. anpassen
                 if img_url.startswith('//'):
                     img_url = 'https:' + img_url
@@ -74,4 +74,3 @@ if st.button("🔍 Athlet finden"):
             st.image(image_url, caption=top_athlete)
         else:
             st.info("📷 Kein Bild verfügbar.")
-
