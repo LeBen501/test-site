@@ -3,48 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Erfolgreichster Athlet</title>
+    <title>Finde den erfolgreichsten Athleten</title>
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
 </head>
 <body>
     <h1>Finde den erfolgreichsten Athleten</h1>
-    <form>
-        <label>Größe (cm):</label>
-        <input type="number" id="height" required>
-        
-        <label>Gewicht (kg):</label>
-        <input type="number" id="weight" required>
-        
-        <label>Geschlecht:</label>
-        <select id="sex">
-            <option value="M">Männlich</option>
-            <option value="F">Weiblich</option>
-        </select>
+    
+    <label>Größe (cm):</label>
+    <input type="number" id="height">
+    
+    <label>Gewicht (kg):</label>
+    <input type="number" id="weight">
+    
+    <label>Geschlecht:</label>
+    <select id="sex">
+        <option value="M">Männlich</option>
+        <option value="F">Weiblich</option>
+    </select>
 
-        <button type="button" py-click="find_athlete">Suchen</button>
-    </form>
-
+    <button py-click="find_athlete">Suchen</button>
+    
     <div id="result"></div>
 
     <py-script>
-        import pandas as pd
+        import json
+        import js
 
-        def find_athlete():
+        async def find_athlete():
+            # Eingaben holen
             height = int(Element("height").element.value)
             weight = int(Element("weight").element.value)
             sex = Element("sex").element.value
+            
+            # JSON-Datei laden
+            response = await js.fetch("athletes.json")
+            data = await response.json()
 
-            df = pd.read_csv("athletes.csv")  # CSV-Datei muss auch hochgeladen werden!
-
-            filtered_df = df[(df["Height"] == height) & (df["Weight"] == weight) & (df["Sex"] == sex)]
-            medal_count = filtered_df[filtered_df["Medal"].notna()].groupby("Name")["Medal"].count()
-
-            if medal_count.empty:
+            # Daten filtern
+            matching_athletes = [a for a in data if a["Height"] == height and a["Weight"] == weight and a["Sex"] == sex]
+            
+            # Bester Athlet ermitteln
+            if not matching_athletes:
                 Element("result").element.innerText = "Kein passender Athlet gefunden."
             else:
-                top_athlete = medal_count.idxmax()
-                max_medals = medal_count.max()
-                Element("result").element.innerText = f"Erfolgreichster Athlet: {top_athlete} mit {max_medals} Medaillen!"
+                best_athlete = max(matching_athletes, key=lambda x: x["Medals"])
+                Element("result").element.innerText = f"Erfolgreichster Athlet: {best_athlete['Name']} mit {best_athlete['Medals']} Medaillen!"
     </py-script>
 </body>
 </html>
+
