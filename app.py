@@ -4,7 +4,7 @@ import pandas as pd
 # CSV-Datei laden
 @st.cache_data
 def load_data():
-    return pd.read_csv("./athletes.csv")
+    return pd.read_csv("./OlympicDataexport2025.csv")
 
 df = load_data()
 
