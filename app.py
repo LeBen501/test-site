@@ -51,3 +51,4 @@ if st.button("🔍 Athlet finden"):
                 st.image(image_url, caption=top_athlete, use_column_width=True)
             else:
                 st.info("📷 Kein Bild verfügbar.")
+
