@@ -14,7 +14,6 @@ def get_wikipedia_image_infobox(name):
     """
     Sucht gezielt das Bild in der Infobox eines Wikipedia-Artikels.
     """
-    # Ersetze Leerzeichen durch Unterstriche für den Wikipedia-URL
     URL = f"https://en.wikipedia.org/wiki/{name.replace(' ', '_')}"
     response = requests.get(URL)
     
@@ -23,7 +22,7 @@ def get_wikipedia_image_infobox(name):
         
         # Suche nach der Infobox, die üblicherweise ein div mit der Klasse "infobox" ist
         infobox = soup.find('table', {'class': 'infobox'})
-        
+
         if infobox:
             # Suche nach dem ersten <img>-Tag innerhalb der Infobox
             img_tag = infobox.find('img')
@@ -67,4 +66,3 @@ if st.button("🔍 Athlet finden"):
             st.image(image_url, caption=top_athlete)
         else:
             st.info("📷 Kein Bild aus der Infobox verfügbar.")
-
