@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import requests
+from bs4 import BeautifulSoup
 
 # CSV-Datei laden
 @st.cache_data
@@ -9,58 +10,34 @@ def load_data():
 
 df = load_data()
 
-def get_wikipedia_image_api(name):
+def get_wikipedia_image_infobox(name):
     """
-    Ruft über die MediaWiki-API das Bild (Thumbnail) eines Artikels ab.
+    Sucht gezielt das Bild in der Infobox eines Wikipedia-Artikels.
     """
-    URL = "https://en.wikipedia.org/w/api.php"
-    PARAMS = {
-        "action": "query",
-        "titles": name,
-        "prop": "pageimages",
-        "format": "json",
-        "pithumbsize": 500
-    }
-    response = requests.get(URL, params=PARAMS)
-    data = response.json()
-    pages = data.get("query", {}).get("pages", {})
-    for pageid in pages:
-        page = pages[pageid]
-        thumbnail = page.get("thumbnail", {})
-        source = thumbnail.get("source")
-        if source:
-            return source
-    return None
-
-def get_wikipedia_image_fallback(name):
-    """
-    Fallback-Methode: Falls die API kein Bild liefert, wird die Wikipedia-Seite per HTML-Scraping untersucht.
-    """
-    # Ersetze Leerzeichen durch Unterstriche, damit der URL korrekt ist
+    # Ersetze Leerzeichen durch Unterstriche für den Wikipedia-URL
     URL = f"https://en.wikipedia.org/wiki/{name.replace(' ', '_')}"
     response = requests.get(URL)
+    
     if response.status_code == 200:
-        from bs4 import BeautifulSoup
         soup = BeautifulSoup(response.text, 'html.parser')
-        # Suche nach allen <img>-Tags auf der Seite
-        img_tags = soup.find_all('img')
-        for img_tag in img_tags:
-            img_url = img_tag.get('src')
-            if img_url and (img_url.endswith(('jpg', 'jpeg', 'png'))):
-                if img_url.startswith('//'):
-                    img_url = 'https:' + img_url
-                elif img_url.startswith('/'):
-                    img_url = 'https://en.wikipedia.org' + img_url
-                return img_url
+        
+        # Suche nach der Infobox, die üblicherweise ein div mit der Klasse "infobox" ist
+        infobox = soup.find('table', {'class': 'infobox'})
+        
+        if infobox:
+            # Suche nach dem ersten <img>-Tag innerhalb der Infobox
+            img_tag = infobox.find('img')
+            if img_tag:
+                img_url = img_tag.get('src')
+                if img_url:
+                    # Falls die URL mit "//" beginnt, füge "https:" hinzu
+                    if img_url.startswith('//'):
+                        img_url = 'https:' + img_url
+                    # Falls die URL mit '/' beginnt, ergänze die Domain von Wikipedia
+                    elif img_url.startswith('/'):
+                        img_url = 'https://en.wikipedia.org' + img_url
+                    return img_url
     return None
-
-def get_wikipedia_image(name):
-    # Zuerst versuchen wir, über die MediaWiki-API ein Bild abzurufen
-    img = get_wikipedia_image_api(name)
-    if img:
-        return img
-    # Falls die API kein Bild liefert, Fallback zur HTML-Suche
-    return get_wikipedia_image_fallback(name)
 
 st.title("🏅 Finde den erfolgreichsten Athleten!")
 st.markdown("Gib Größe, Gewicht und Geschlecht ein, um den erfolgreichsten Athleten zu finden.")
@@ -84,8 +61,10 @@ if st.button("🔍 Athlet finden"):
             max_medals = medal_count.max()
             st.success(f"🏆 Erfolgreichster Athlet: **{top_athlete}** mit **{max_medals}** Medaillen!")
         
-        image_url = get_wikipedia_image(top_athlete)
+        # Bild aus der Infobox abrufen
+        image_url = get_wikipedia_image_infobox(top_athlete)
         if image_url:
             st.image(image_url, caption=top_athlete)
         else:
-            st.info("📷 Kein Bild verfügbar.")
+            st.info("📷 Kein Bild aus der Infobox verfügbar.")
+
