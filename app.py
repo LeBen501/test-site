@@ -17,17 +17,24 @@ def get_infobox_image(name):
     page = wiki_wiki.page(name)
     
     if page.exists():
-        # Suche nach der Infobox (direkt in der Seite)
-        infobox = page.text.split("{{Infobox")[1].split("}}")[0]
-        for line in infobox.split("\n"):
-            if "image" in line.lower():
-                # Suche nach Bild-URL
-                img_url = line.split("image =")[-1].strip().replace(" ", "_")
-                if img_url.endswith(('jpg', 'jpeg', 'png')):
-                    return f"https://en.wikipedia.org/wiki/File:{img_url}"
+        # Wir gehen direkt auf den Text der Seite und suchen nach der Infobox
+        text = page.text
+        infobox_start = text.find("{{Infobox")
+        infobox_end = text.find("}}", infobox_start) + 2
+        infobox = text[infobox_start:infobox_end]
+        
+        # Nach einem Bild in der Infobox suchen (z. B. image = ...)
+        image_tag = "image ="  # Bildtag in der Infobox
+        if image_tag in infobox:
+            image_line = infobox.split(image_tag)[-1]
+            image_url = image_line.split("\n")[0].strip()
+            if image_url:
+                # Die URL zum Bild korrekt formatieren
+                if image_url.startswith("File:"):
+                    return f"https://en.wikipedia.org/wiki/{image_url}"
     return None
 
-# Funktion zum Abrufen des Wikipedia-Bildes, wenn es nicht in der Infobox ist
+# Funktion zum Abrufen des Wikipedia-Bildes von der gesamten Seite
 def get_wikipedia_image(name):
     # Wenn kein Bild in der Infobox gefunden wird, suche auf der gesamten Seite
     wiki_wiki = wikipediaapi.Wikipedia(language='en', user_agent="AthleteFinderApp (suberio.01.11@gmail.com)") 
