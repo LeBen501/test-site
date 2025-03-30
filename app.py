@@ -11,8 +11,25 @@ def load_data():
 
 df = load_data()
 
-# Funktion zum Abrufen des Wikipedia-Bildes
+# Funktion zum Abrufen des Wikipedia-Bildes aus der Infobox
+def get_infobox_image(name):
+    wiki_wiki = wikipediaapi.Wikipedia(language='en', user_agent="AthleteFinderApp (suberio.01.11@gmail.com)") 
+    page = wiki_wiki.page(name)
+    
+    if page.exists():
+        # Suche nach der Infobox (direkt in der Seite)
+        infobox = page.text.split("{{Infobox")[1].split("}}")[0]
+        for line in infobox.split("\n"):
+            if "image" in line.lower():
+                # Suche nach Bild-URL
+                img_url = line.split("image =")[-1].strip().replace(" ", "_")
+                if img_url.endswith(('jpg', 'jpeg', 'png')):
+                    return f"https://en.wikipedia.org/wiki/File:{img_url}"
+    return None
+
+# Funktion zum Abrufen des Wikipedia-Bildes, wenn es nicht in der Infobox ist
 def get_wikipedia_image(name):
+    # Wenn kein Bild in der Infobox gefunden wird, suche auf der gesamten Seite
     wiki_wiki = wikipediaapi.Wikipedia(language='en', user_agent="AthleteFinderApp (suberio.01.11@gmail.com)") 
     page = wiki_wiki.page(name)
     
@@ -68,8 +85,13 @@ if st.button("🔍 Athlet finden"):
             max_medals = medal_count.max()
             st.success(f"🏆 Erfolgreichster Athlet: **{top_athlete}** mit **{max_medals}** Medaillen!")
 
-        # Wikipedia-Bild abrufen und anzeigen
-        image_url = get_wikipedia_image(top_athlete)
+        # Zuerst nach einem Bild in der Infobox suchen
+        image_url = get_infobox_image(top_athlete)
+        
+        if not image_url:
+            # Wenn kein Bild in der Infobox vorhanden ist, auf der Seite nach einem Bild suchen
+            image_url = get_wikipedia_image(top_athlete)
+        
         if image_url:
             st.image(image_url, caption=top_athlete)
         else:
